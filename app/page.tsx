@@ -2,152 +2,160 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { Card, SectionLabel, Pill } from "@/components/ui/Card";
 import { Onboarding } from "@/components/onboarding/Onboarding";
 import { cn } from "@/lib/cn";
 
 const FEATURES = [
   {
     href: "/practice",
-    emoji: "💬",
+    no: "01",
     title: "Practice",
+    lede: "Rehearse the moment before it happens.",
     blurb:
-      "Rehearse real moments — ordering at a café, a job interview, joining a group, a phone call — with a patient partner who never rushes you. Gentle coaching and a confidence meter help you see your own progress.",
+      "Order at a café, sit a job interview, join a group, make a phone call — with a partner who never rushes you. Gentle coaching and a confidence meter let you watch your own progress.",
     cta: "Start practicing",
     tone: "brand" as const,
   },
   {
     href: "/decode",
-    emoji: "🔍",
+    no: "02",
     title: "Decode",
+    lede: "Understand what they actually meant.",
     blurb:
-      "Paste a confusing text, DM, or email — or just describe a situation. Aura explains what it literally means, the likely tone, whether it's a joke or sarcasm, and a few kind ways you could reply.",
+      "Paste a confusing text, DM, or email — or just describe a situation. Aura explains the literal meaning, the likely tone, whether it's a joke or sarcasm, and a few kind ways you could reply.",
     cta: "Decode a message",
     tone: "accent" as const,
   },
   {
     href: "/checkin",
-    emoji: "🌤️",
+    no: "03",
     title: "Check-in",
+    lede: "A quiet moment, just for you.",
     blurb:
-      "A quick, quiet mood log. Aura reflects back what it hears with warmth and offers one small grounding tip. Your check-ins stay private, on your device — nobody else sees them.",
+      "A small mood log. Aura reflects back what it hears with warmth and offers one grounding tip. Your check-ins stay on your device — nobody else ever sees them.",
     cta: "Take a moment",
     tone: "calm" as const,
   },
 ];
 
 const ACCESS = [
-  { emoji: "🎨", label: "Calm color moods", hint: "Dawn, Dusk, or Meadow" },
-  { emoji: "🔠", label: "Text size & spacing", hint: "Dyslexia-friendly option" },
-  { emoji: "🌗", label: "High contrast", hint: "Easier to read" },
-  { emoji: "🍃", label: "Reduce motion", hint: "Fewer animations" },
-  { emoji: "🎯", label: "Focus mode", hint: "Dims the rest" },
-  { emoji: "🔒", label: "Stays on-device", hint: "Private by design" },
+  { label: "Calm colour moods", hint: "Dawn · Dusk · Meadow" },
+  { label: "Text size & spacing", hint: "Dyslexia-friendly option" },
+  { label: "High contrast", hint: "Sharper to read" },
+  { label: "Reduce motion", hint: "Fewer animations" },
+  { label: "Focus mode", hint: "Dims the rest" },
+  { label: "Stays on-device", hint: "Private by design" },
 ];
+
+const toneDot: Record<string, string> = {
+  brand: "bg-brand",
+  accent: "bg-accent",
+  calm: "bg-calm",
+};
 
 export default function HomePage() {
   return (
     <>
       <Onboarding />
 
-      <div className="space-y-16 sm:space-y-24">
+      <div className="space-y-20 sm:space-y-28">
         {/* ===== Hero ===== */}
-        <section className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-b from-brand-soft/60 via-surface to-surface px-6 py-12 shadow-soft sm:px-12 sm:py-16">
-          {/* Soft floating accents */}
+        <section className="grain relative overflow-hidden rounded-[1.6rem] border border-border bg-surface px-6 pb-14 pt-16 shadow-soft sm:px-12 sm:pb-20 sm:pt-24">
+          {/* signature breathing aura */}
           <div
-            className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-brand/10 blur-3xl"
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-calm/10 blur-3xl"
+            className="aura-glow animate-aura pointer-events-none absolute left-1/2 top-[18%] h-[34rem] w-[34rem] -translate-x-1/2 rounded-full"
             aria-hidden="true"
           />
 
-          <div className="relative mx-auto max-w-2xl text-center">
-            <Pill tone="brand" className="mb-5">
+          <div className="relative mx-auto max-w-3xl text-center">
+            <p className="eyebrow mb-7 flex items-center justify-center gap-2">
               <span
-                className="h-1.5 w-1.5 rounded-full bg-brand animate-breathe"
+                className="inline-block h-1.5 w-1.5 rounded-full bg-brand animate-breathe"
                 aria-hidden="true"
               />
-              A gentle social companion
-            </Pill>
-
-            <h1 className="text-balance text-4xl font-bold leading-[1.1] tracking-tight text-ink sm:text-5xl">
-              Meet{" "}
-              <span className="relative whitespace-nowrap text-brand">
-                Aura
-                <span
-                  className="absolute -bottom-1 left-0 h-2 w-full rounded-full bg-brand/15"
-                  aria-hidden="true"
-                />
-              </span>
-            </h1>
-
-            <p className="mx-auto mt-5 max-w-xl text-pretty text-lg text-ink-soft sm:text-xl">
-              A gentle space to practice talking, understand confusing messages,
-              and check in with yourself.
+              Aura · a companion for neurodiverse minds
             </p>
 
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <h1 className="font-display text-balance text-[2.6rem] font-medium leading-[1.05] tracking-tight text-ink sm:text-6xl">
+              A gentle place to practice
+              <br className="hidden sm:block" />{" "}
+              <em className="font-display italic text-brand">being yourself</em>.
+            </h1>
+
+            <p className="mx-auto mt-7 max-w-xl text-pretty text-lg leading-relaxed text-ink-soft sm:text-xl">
+              Rehearse real conversations, make sense of confusing messages, and
+              check in with how you feel — calmly, privately, at your own pace.
+            </p>
+
+            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link href="/practice">
                 <Button variant="primary" size="lg" className="w-full sm:w-auto">
-                  💬 Practice a conversation
+                  Practice a conversation
                 </Button>
               </Link>
               <Link href="/decode">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                  🔍 Decode a message
-                </Button>
-              </Link>
-              <Link href="/checkin">
-                <Button variant="soft" size="lg" className="w-full sm:w-auto">
-                  🌤️ Check in
+                  Decode a message
                 </Button>
               </Link>
             </div>
 
-            <p className="mt-6 text-sm text-ink-faint">
-              No account needed. Works offline. Nothing leaves your device.
+            <p className="mt-7 text-sm text-ink-faint">
+              No account. Works offline. Nothing leaves your device.
             </p>
           </div>
         </section>
 
-        {/* ===== Feature cards ===== */}
+        {/* ===== Feature sections (editorial, numbered) ===== */}
         <section aria-labelledby="tools-heading">
-          <div className="mb-8 text-center">
-            <SectionLabel className="justify-center">Three calm tools</SectionLabel>
-            <h2
-              id="tools-heading"
-              className="mt-2 text-2xl font-bold tracking-tight text-ink sm:text-3xl"
-            >
-              Pick whatever you need today
-            </h2>
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow">Three calm tools</p>
+              <h2
+                id="tools-heading"
+                className="font-display mt-2 text-3xl font-medium tracking-tight text-ink sm:text-4xl"
+              >
+                Pick whatever you need today
+              </h2>
+            </div>
+            <p className="max-w-xs text-sm text-ink-faint">
+              Each one stands alone. There&rsquo;s no order, no streak to keep,
+              no pressure. Use what helps.
+            </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="border-t border-border">
             {FEATURES.map((f) => (
               <Link
                 key={f.href}
                 href={f.href}
-                className="group block focus-visible:outline-none"
+                className="group block border-b border-border focus-visible:outline-none"
               >
-                <Card className="flex h-full flex-col transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lift group-focus-visible:-translate-y-1 group-focus-visible:shadow-lift">
-                  <div
-                    className={cn(
-                      "grid h-12 w-12 place-items-center rounded-2xl text-2xl",
-                      f.tone === "brand" && "bg-brand-soft",
-                      f.tone === "accent" && "bg-accent/15",
-                      f.tone === "calm" && "bg-calm/15",
-                    )}
-                    aria-hidden="true"
-                  >
-                    {f.emoji}
+                <div className="grid grid-cols-1 gap-3 py-8 transition-colors duration-300 group-hover:bg-surface/60 sm:grid-cols-[5rem_1fr_auto] sm:items-baseline sm:gap-8 sm:px-4">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={cn(
+                        "h-2 w-2 rounded-full",
+                        toneDot[f.tone],
+                      )}
+                      aria-hidden="true"
+                    />
+                    <span className="font-display text-lg text-ink-faint">
+                      {f.no}
+                    </span>
                   </div>
-                  <h3 className="mt-4 text-xl font-bold tracking-tight text-ink">
-                    {f.title}
-                  </h3>
-                  <p className="mt-2 flex-1 text-ink-soft">{f.blurb}</p>
-                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-brand">
+
+                  <div>
+                    <h3 className="font-display text-2xl font-medium tracking-tight text-ink sm:text-3xl">
+                      {f.title}
+                    </h3>
+                    <p className="mt-1 text-[1.05rem] italic text-ink-soft">
+                      {f.lede}
+                    </p>
+                    <p className="mt-3 max-w-2xl text-ink-soft">{f.blurb}</p>
+                  </div>
+
+                  <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-brand sm:mt-0 sm:self-center">
                     {f.cta}
                     <span
                       className="transition-transform duration-300 group-hover:translate-x-1"
@@ -156,7 +164,7 @@ export default function HomePage() {
                       →
                     </span>
                   </span>
-                </Card>
+                </div>
               </Link>
             ))}
           </div>
@@ -164,68 +172,66 @@ export default function HomePage() {
 
         {/* ===== Accessibility section ===== */}
         <section aria-labelledby="access-heading">
-          <Card className="overflow-hidden bg-gradient-to-br from-surface to-surface-2 p-7 sm:p-10">
-            <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-              <div>
-                <SectionLabel>Built for how you actually feel</SectionLabel>
-                <h2
-                  id="access-heading"
-                  className="mt-2 text-2xl font-bold tracking-tight text-ink sm:text-3xl"
-                >
-                  Shape Aura around your senses
-                </h2>
-                <p className="mt-4 text-ink-soft">
-                  Bright screens, busy motion, and tiny text can make a hard day
-                  harder. So Aura lets you tune almost everything. Open the{" "}
-                  <strong className="text-ink">Settings</strong> button in the
-                  top bar to choose a calmer color mood, larger text, dyslexia
-                  -friendly spacing, high contrast, reduced motion, or a focus
-                  mode that quietly dims everything but the task in front of you.
-                </p>
-                <p className="mt-4 text-ink-soft">
-                  Your settings and check-ins live only on this device. We think
-                  privacy should be the default, not a setting you have to find.
-                </p>
-              </div>
-
-              <ul className="grid grid-cols-2 gap-3" role="list">
-                {ACCESS.map((a) => (
-                  <li
-                    key={a.label}
-                    className="flex items-start gap-3 rounded-2xl border border-border bg-surface p-4"
-                  >
-                    <span className="text-xl" aria-hidden="true">
-                      {a.emoji}
-                    </span>
-                    <span>
-                      <span className="block text-sm font-semibold text-ink">
-                        {a.label}
-                      </span>
-                      <span className="block text-xs text-ink-faint">
-                        {a.hint}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
+          <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+            <div>
+              <p className="eyebrow">Built for how you actually feel</p>
+              <h2
+                id="access-heading"
+                className="font-display mt-2 text-3xl font-medium tracking-tight text-ink sm:text-4xl"
+              >
+                Shape Aura around your senses
+              </h2>
+              <p className="mt-5 text-ink-soft">
+                Bright screens, busy motion, and tiny text can make a hard day
+                harder. So almost everything here can be tuned. Open{" "}
+                <strong className="font-semibold text-ink">Settings</strong> in
+                the top bar to choose a calmer colour mood, larger text,
+                dyslexia-friendly spacing, high contrast, reduced motion, or a
+                focus mode that quietly dims everything but the task in front of
+                you.
+              </p>
+              <p className="mt-4 text-ink-soft">
+                Your settings and check-ins live only on this device. Privacy is
+                the default here, not a setting you have to go hunting for.
+              </p>
             </div>
-          </Card>
+
+            <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-[1.1rem] border border-border bg-border sm:grid-cols-2">
+              {ACCESS.map((a) => (
+                <li key={a.label} className="bg-surface p-5">
+                  <span className="font-display block text-lg text-ink">
+                    {a.label}
+                  </span>
+                  <span className="mt-0.5 block text-sm text-ink-faint">
+                    {a.hint}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </section>
 
         {/* ===== Footer / cause note ===== */}
-        <footer className="border-t border-border pt-8 text-center">
-          <p className="mx-auto max-w-2xl text-sm text-ink-soft">
+        <footer className="border-t border-border pt-10 text-center">
+          <span
+            className="mx-auto mb-5 flex h-7 w-7 items-center justify-center"
+            aria-hidden="true"
+          >
+            <span className="relative grid h-6 w-6 place-items-center">
+              <span className="absolute inset-0 rounded-full bg-brand/20 animate-breathe" />
+              <span className="relative h-2.5 w-2.5 rounded-full bg-brand" />
+            </span>
+          </span>
+          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-ink-soft">
             Aura was built for the{" "}
             <span className="font-semibold text-ink">Youth Code x AI</span>{" "}
-            hackathon (Track 3: AI That Actually Helps People), whose proceeds
+            hackathon — Track 3, AI That Actually Helps People — whose proceeds
             support the{" "}
-            <span className="font-semibold text-ink">
-              Akhil Autism Foundation
-            </span>
+            <span className="font-semibold text-ink">Akhil Autism Foundation</span>
             .
           </p>
           <p className="mt-3 text-xs text-ink-faint">
-            🔒 Your conversations, check-ins, and settings stay on your device.
+            Your conversations, check-ins, and settings stay on your device.
             Powered by Claude, with gentle fallback responses when offline.
           </p>
         </footer>

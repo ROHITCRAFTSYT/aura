@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Atkinson_Hyperlegible, Inter } from "next/font/google";
+import { Atkinson_Hyperlegible, Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { SettingsProvider } from "@/components/SettingsProvider";
 import { AppShell } from "@/components/AppShell";
@@ -15,6 +15,15 @@ const atkinson = Atkinson_Hyperlegible({
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+// Editorial display serif — warm, characterful, soft optical sizing.
+const fraunces = Fraunces({
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-fraunces",
   display: "swap",
 });
 
@@ -60,7 +69,9 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: noFlashScript }} />
       </head>
-      <body className={`${atkinson.variable} ${inter.variable}`}>
+      <body
+        className={`${atkinson.variable} ${inter.variable} ${fraunces.variable}`}
+      >
         <SettingsProvider>
           <AppShell>{children}</AppShell>
         </SettingsProvider>

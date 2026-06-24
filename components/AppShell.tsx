@@ -20,7 +20,9 @@ function AuraMark() {
         <span className="absolute inset-0 rounded-full bg-brand/20 animate-breathe" />
         <span className="relative h-4 w-4 rounded-full bg-brand" />
       </span>
-      <span className="text-lg font-bold tracking-tight text-ink">Aura</span>
+      <span className="font-display text-xl font-medium tracking-tight text-ink">
+        Aura
+      </span>
     </span>
   );
 }

@@ -85,7 +85,7 @@ export function DecodeStudio() {
     <div className="flex flex-col gap-8 animate-fade-up">
       <header className="flex flex-col gap-2">
         <SectionLabel>Decode</SectionLabel>
-        <h1 className="text-2xl font-semibold text-ink sm:text-3xl">
+        <h1 className="font-display text-2xl font-medium text-ink sm:text-3xl">
           What did they really mean?
         </h1>
         <p className="max-w-2xl text-ink-soft">

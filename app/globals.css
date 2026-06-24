@@ -3,95 +3,100 @@
 @tailwind utilities;
 
 /*
- * Aura design tokens.
+ * Aura design tokens — "warm editorial sanctuary".
+ * Inspired by Claude's paper-ivory canvas: warm light, an editorial serif for
+ * display, clay + sage accents. Calm by design (the audience is neurodiverse
+ * youth) — craft comes from typography, texture and space, not flashy effects.
+ *
  * Colors are RGB triples so Tailwind's `rgb(var(--x) / <alpha>)` works.
- * Themes + accessibility modes are switched by data-* attributes that
- * SettingsProvider writes onto <html>. Nothing here hard-codes a color in a
- * component — everything reads a token, so a single toggle restyles the app.
+ * Themes + accessibility modes switch via data-* attributes that
+ * SettingsProvider writes onto <html>. Components only read tokens, so one
+ * toggle restyles the whole app.
  */
 :root {
-  /* default: "Dawn" — warm, low-stimulation */
-  --bg: 247 244 239;
-  --surface: 255 253 250;
-  --surface-2: 244 240 233;
-  --border: 228 222 212;
-  --ink: 41 42 46;
-  --ink-soft: 88 90 98;
-  --ink-faint: 138 140 150;
-  --brand: 92 124 160; /* calm slate-blue */
-  --brand-soft: 224 232 242;
-  --accent: 196 142 110; /* soft terracotta */
-  --calm: 122 158 150; /* sage */
-  --positive: 104 152 120;
-  --warn: 196 150 86;
-  --shadow: 60 56 50;
+  /* "Dawn" — warm ivory paper, the default */
+  --bg: 244 241 233;
+  --surface: 251 248 241;
+  --surface-2: 237 232 222;
+  --border: 224 217 203;
+  --ink: 38 34 28;
+  --ink-soft: 99 91 80;
+  --ink-faint: 152 143 129;
+  --brand: 193 101 70; /* clay / terracotta */
+  --brand-soft: 240 224 213;
+  --accent: 176 138 84; /* warm ochre */
+  --calm: 116 142 118; /* sage */
+  --positive: 104 142 110;
+  --warn: 188 142 78;
+  --shadow: 58 46 34;
 
   --font-sans: var(--font-atkinson), "Inter", system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-reading: var(--font-atkinson), Georgia, serif;
 
-  --radius: 1rem;
-  --speed: 1; /* motion multiplier — 0 when reduced motion is on */
+  --radius: 1.1rem;
 }
 
-/* "Dusk" — dim, cool, easy on light-sensitive eyes */
+/* "Dusk" — warm charcoal, candle-lit rather than clinical */
 [data-theme="dusk"] {
-  --bg: 24 27 33;
-  --surface: 32 36 44;
-  --surface-2: 40 45 55;
-  --border: 52 58 70;
-  --ink: 232 234 240;
-  --ink-soft: 178 184 196;
-  --ink-faint: 128 136 150;
-  --brand: 138 170 206;
-  --brand-soft: 44 56 72;
-  --accent: 214 162 128;
-  --calm: 142 178 168;
-  --positive: 132 184 150;
-  --warn: 214 176 110;
+  --bg: 26 23 20;
+  --surface: 35 31 27;
+  --surface-2: 45 40 34;
+  --border: 61 54 46;
+  --ink: 240 234 224;
+  --ink-soft: 188 179 166;
+  --ink-faint: 136 127 114;
+  --brand: 216 144 106;
+  --brand-soft: 58 44 36;
+  --accent: 200 168 112;
+  --calm: 142 176 148;
+  --positive: 140 182 148;
+  --warn: 212 172 110;
   --shadow: 0 0 0;
 }
 
-/* "Meadow" — soft green, grounding */
+/* "Meadow" — soft sage, grounding */
 [data-theme="meadow"] {
-  --bg: 242 246 240;
-  --surface: 252 254 250;
-  --surface-2: 234 242 232;
-  --border: 216 228 214;
-  --ink: 38 46 42;
-  --ink-soft: 82 96 88;
-  --ink-faint: 130 146 136;
-  --brand: 96 142 118;
-  --brand-soft: 220 236 226;
-  --accent: 176 158 110;
-  --calm: 120 162 150;
-  --positive: 96 152 116;
+  --bg: 240 243 235;
+  --surface: 250 251 245;
+  --surface-2: 230 236 224;
+  --border: 213 224 205;
+  --ink: 34 42 34;
+  --ink-soft: 86 98 86;
+  --ink-faint: 132 146 130;
+  --brand: 104 136 100; /* sage as the lead here */
+  --brand-soft: 222 234 215;
+  --accent: 178 148 92;
+  --calm: 120 158 134;
+  --positive: 100 150 110;
   --warn: 190 156 84;
-  --shadow: 40 56 46;
+  --shadow: 38 50 38;
 }
 
-/* High contrast — overrides on top of any theme */
+/* High contrast — layered on top of any theme */
 [data-contrast="high"] {
-  --ink: 12 12 14;
-  --ink-soft: 36 38 44;
-  --ink-faint: 70 74 84;
-  --border: 90 94 104;
-  --brand: 40 78 124;
-  --surface: 255 255 255;
-  --bg: 248 248 248;
+  --ink: 18 15 11;
+  --ink-soft: 44 38 30;
+  --ink-faint: 78 70 60;
+  --border: 96 86 72;
+  --brand: 160 74 46;
+  --surface: 255 254 250;
+  --bg: 248 246 240;
 }
 [data-theme="dusk"][data-contrast="high"] {
-  --ink: 255 255 255;
-  --ink-soft: 226 230 238;
-  --ink-faint: 190 196 208;
-  --border: 150 158 172;
-  --brand: 168 198 232;
-  --surface: 18 20 26;
-  --bg: 8 9 12;
+  --ink: 255 253 248;
+  --ink-soft: 228 222 212;
+  --ink-faint: 192 184 172;
+  --border: 156 146 132;
+  --brand: 236 174 138;
+  --surface: 20 17 14;
+  --bg: 10 8 6;
 }
 
-/* Dyslexia-friendly: switch to Atkinson everywhere + extra spacing */
+/* Dyslexia-friendly: Atkinson everywhere (incl. display) + extra spacing */
 [data-readable="true"] {
   --font-sans: var(--font-atkinson), system-ui, sans-serif;
+  --font-display: var(--font-atkinson), system-ui, sans-serif;
   letter-spacing: 0.01em;
   word-spacing: 0.06em;
 }
@@ -145,7 +150,7 @@ body {
 
 /* Focus mode dims everything except the active card */
 [data-focus="true"] [data-dimmable="true"] {
-  opacity: 0.35;
+  opacity: 0.32;
   filter: saturate(0.7);
   transition: opacity 0.3s ease;
 }
@@ -158,7 +163,7 @@ body {
 }
 
 ::selection {
-  background: rgb(var(--brand-soft));
+  background: rgb(var(--brand) / 0.22);
   color: rgb(var(--ink));
 }
 
@@ -178,8 +183,75 @@ body {
   background-clip: content-box;
 }
 
+/* ---- Editorial helpers ---- */
+
+.font-display {
+  font-family: var(--font-display);
+  font-feature-settings: "ss01", "liga", "dlig";
+}
+
+/* Small-caps eyebrow / magazine label */
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(var(--ink-faint));
+}
+
+/* Hairline rule used to structure the page like print */
+.rule {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgb(var(--border)),
+    rgb(var(--border) / 0)
+  );
+}
+
 .aura-card {
   background-color: rgb(var(--surface));
   border: 1px solid rgb(var(--border));
   border-radius: var(--radius);
+}
+
+/* Subtle paper grain — adds warmth/depth without stimulation. Off in high
+ * contrast so text edges stay crisp. */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+[data-contrast="high"] .grain::before {
+  display: none;
+}
+
+/* The signature "aura" — a soft radial glow that gently breathes. */
+.aura-glow {
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgb(var(--brand) / 0.22),
+    rgb(var(--accent) / 0.12) 38%,
+    rgb(var(--bg) / 0) 70%
+  );
+  filter: blur(8px);
+}
+
+@keyframes aura-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+.animate-aura {
+  animation: aura-breathe 7s ease-in-out infinite;
 }
