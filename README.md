@@ -6,13 +6,15 @@ Aura is a calm, sensory-friendly social companion for autistic and neurodiverse 
 
 Built for the **Youth Code x AI** hackathon (Track 3: *AI That Actually Helps People*), whose proceeds support the **Akhil Autism Foundation**.
 
+🌐 **Live demo:** https://aura-seven-livid.vercel.app
+
 ---
 
 ## What it does
 
 Aura has three small tools, each designed to lower the pressure of a real moment:
 
-- **💬 Practice** — Rehearse real-world scenarios (a café order, a job interview, joining a group, a phone call, a disagreement) with a patient AI roleplay partner. You get gentle, specific coaching and a confidence meter so you can see your own progress without being scored or judged.
+- **💬 Practice** — Rehearse real-world scenarios (a café order, a job interview, joining a group, a phone call, a disagreement) with a patient AI roleplay partner. Tap a **starter phrase** if you're not sure how to begin, get gentle, specific coaching and a confidence meter as you go, and end with a warm **session reflection** showing your average confidence — never a grade or a judgement.
 - **🔍 Decode** — Paste a confusing message, DM, or email, or just describe a situation. Aura explains the literal meaning, the likely tone, whether something is sarcasm or a joke, and suggests a few kind ways you could reply.
 - **🌤️ Check-in** — A quick, quiet mood log. Aura reflects back what it hears with warmth and offers one small grounding tip. Check-ins are kept privately on-device.
 
@@ -26,9 +28,11 @@ Accessibility is a first-class feature, not an afterthought. A **sensory setting
 - **Reduce motion** (also respects your OS `prefers-reduced-motion`)
 - **Focus mode** that dims everything except the task in front of you
 
-Typography uses **Atkinson Hyperlegible** throughout for maximum readability.
+Typography uses **Atkinson Hyperlegible** for body text (it stays readable even in dyslexia-friendly mode), paired with the **Fraunces** editorial serif for a warm, distinctive feel. Beyond the settings panel, Aura ships with deeper accessibility care: a **skip-to-content** link, **`aria-live` announcements** so screen readers hear AI responses as they arrive, semantic landmarks, and large, keyboard-friendly targets.
 
-**Privacy is a core promise.** All personal data — check-ins and settings — stays in your browser's local storage and never leaves your device. There are no accounts and no tracking.
+**A duty of care.** Aura is a practice space, not a crisis service — and it says so. Every page carries a calm footer with real, free helplines (988 in the US, Samaritans in the UK/ROI, and findahelpline.com worldwide) and a nudge to reach a trusted adult.
+
+**Privacy is a core promise.** All personal data — check-ins and settings — stays in your browser's local storage and never leaves your device. There are no accounts and no tracking. The Check-in tool even draws an on-device **mood trend sparkline** so progress is visible without anything being uploaded.
 
 ## Works offline
 

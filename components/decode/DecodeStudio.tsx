@@ -188,7 +188,11 @@ export function DecodeStudio() {
 
 function DecodeResultCard({ result }: { result: DecodeResult }) {
   return (
-    <Card className="flex flex-col gap-6 animate-fade-up">
+    <Card
+      role="status"
+      aria-live="polite"
+      className="flex flex-col gap-6 animate-fade-up"
+    >
       <div className="flex flex-wrap items-center gap-2">
         <Pill tone="brand">{result.vibe}</Pill>
         {result.notLiteral && (

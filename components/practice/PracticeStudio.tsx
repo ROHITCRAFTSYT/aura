@@ -22,6 +22,48 @@ const DIFFICULTIES: { value: Difficulty; label: string; hint: string }[] = [
   { value: "challenge", label: "Challenge", hint: "A little more spice" },
 ];
 
+// Optional openers for the "I don't know how to start" moment — tap to fill,
+// then edit or send. Lowering that first barrier is the whole point.
+const STARTERS: Record<string, string[]> = {
+  cafe: [
+    "Hi, could I get a hot chocolate, please?",
+    "What would you recommend?",
+  ],
+  group: [
+    "Hi — mind if I join? I love this too.",
+    "Oh, I watched that last night!",
+  ],
+  interview: [
+    "Hello, thank you for seeing me today.",
+    "I'm really interested in this role.",
+  ],
+  doctor: [
+    "Hi, I'd like to book a check-up, please.",
+    "Hello — when is your next free slot?",
+  ],
+  disagree: [
+    "I'd love to, but could we do something quieter?",
+    "Big crowds are hard for me — can we tweak the plan?",
+  ],
+  feedback: [
+    "Sorry, could you explain that part again?",
+    "I didn't quite follow — could you help?",
+  ],
+};
+
+function average(nums: number[]): number {
+  if (nums.length === 0) return 0;
+  return Math.round(nums.reduce((s, n) => s + n, 0) / nums.length);
+}
+
+function encouragement(avg: number): string {
+  if (avg >= 85)
+    return "You showed real warmth and clarity. That takes courage — be proud of this.";
+  if (avg >= 70)
+    return "You kept it kind and clear. Every practice like this makes the real thing easier.";
+  return "You showed up and tried, and that matters most. Come back whenever you'd like another go.";
+}
+
 export function PracticeStudio() {
   const [scenarioId, setScenarioId] = useState<string | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>("gentle");
@@ -31,6 +73,8 @@ export function PracticeStudio() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [scores, setScores] = useState<number[]>([]);
+  const [summary, setSummary] = useState(false);
 
   const scenario = scenarioId ? getScenario(scenarioId) : undefined;
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -57,6 +101,8 @@ export function PracticeStudio() {
     setInput("");
     setError(false);
     setLoading(false);
+    setScores([]);
+    setSummary(false);
   }
 
   async function send(nextMessages: ChatMessage[]) {
@@ -79,6 +125,7 @@ export function PracticeStudio() {
       const data: PracticeReply = json.data;
       setMessages([...nextMessages, { role: "assistant", content: data.reply }]);
       setCoach(data.coach);
+      setScores((prev) => [...prev, data.coach.score]);
       setSource(json.source);
     } catch {
       setError(true);
@@ -202,6 +249,15 @@ export function PracticeStudio() {
           {activeDifficulty && (
             <Pill tone="calm">{activeDifficulty.label}</Pill>
           )}
+          {scores.length >= 1 && !summary && (
+            <Button
+              variant="soft"
+              size="sm"
+              onClick={() => setSummary(true)}
+            >
+              Finish & reflect
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={reset}>
             Change scenario
           </Button>
@@ -255,6 +311,25 @@ export function PracticeStudio() {
             )}
           </div>
 
+          {messages.length === 0 && !loading && scenarioId && (
+            <div className="flex flex-wrap items-center gap-2 border-t border-border px-5 pt-4 sm:px-6">
+              <span className="text-xs text-ink-faint">Not sure how to start?</span>
+              {(STARTERS[scenarioId] ?? []).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => {
+                    setInput(s);
+                    inputRef.current?.focus();
+                  }}
+                  className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs text-ink-soft transition-colors hover:border-brand hover:text-brand"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+
           <form
             onSubmit={handleSubmit}
             className="flex items-end gap-2 border-t border-border px-5 py-4 sm:px-6"
@@ -285,7 +360,47 @@ export function PracticeStudio() {
               Demo mode
             </Pill>
           )}
-          <CoachPanel coach={coach} />
+
+          {summary && scores.length > 0 && (
+            <Card
+              role="status"
+              aria-live="polite"
+              className="flex flex-col gap-3 bg-brand-soft/40 animate-fade-up"
+            >
+              <SectionLabel>How that went</SectionLabel>
+              <div className="flex items-end gap-2">
+                <span className="font-display text-4xl leading-none text-brand">
+                  {average(scores)}
+                </span>
+                <span className="pb-1 text-sm text-ink-faint">
+                  / 100 avg confidence
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed text-ink">
+                {encouragement(average(scores))}
+              </p>
+              <p className="text-xs text-ink-faint">
+                {scores.length} {scores.length === 1 ? "reply" : "replies"}{" "}
+                practised in this run.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="soft"
+                  size="sm"
+                  onClick={() => setSummary(false)}
+                >
+                  Keep going
+                </Button>
+                <Button variant="outline" size="sm" onClick={reset}>
+                  New scenario
+                </Button>
+              </div>
+            </Card>
+          )}
+
+          <div role="status" aria-live="polite">
+            <CoachPanel coach={coach} />
+          </div>
         </div>
       </div>
     </div>

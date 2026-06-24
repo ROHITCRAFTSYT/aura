@@ -14,11 +14,11 @@ This is a hackathon project for **Youth Code x AI** (Track 3: AI That Actually H
 
 Aura has three small tools, each designed to take the pressure out of a real moment.
 
-- **Practice** lets you rehearse real scenarios — ordering at a café, a job interview, joining a group, a phone call, a disagreement — with a patient AI partner that never rushes you. After the conversation you get gentle, specific coaching and a confidence meter, so you can see progress without ever being scored or judged.
+- **Practice** lets you rehearse real scenarios — ordering at a café, a job interview, joining a group, a phone call, a disagreement — with a patient AI partner that never rushes you. If you freeze on the first line, tap a **starter phrase** to begin. Gentle, specific coaching and a confidence meter fill in as you go, and a warm **end-of-session reflection** shows your average confidence — progress you can see, without ever being scored or judged.
 - **Decode** takes a confusing text, DM, or email (or a situation you describe) and explains it: the literal meaning, the likely tone, whether it's sarcasm or a joke, and a few kind ways you could reply. It's the friend you text to ask "wait, what did they mean by this?"
-- **Check-in** is a quick, quiet mood log. Aura reflects back what it hears with warmth and gives you one small grounding tip. Check-ins stay private, on your device.
+- **Check-in** is a quick, quiet mood log. Aura reflects back what it hears with warmth and gives you one small grounding tip — and draws a small **mood-trend sparkline** from your past check-ins so you can notice patterns over time. All of it stays private, on your device.
 
-Wrapping all of it is a **sensory settings panel** so the app itself never becomes the stressor.
+Wrapping all of it is a **sensory settings panel** so the app itself never becomes the stressor — and a calm, ever-present footer of real support helplines, because a wellbeing tool has a duty of care.
 
 ## How we built it
 
@@ -27,6 +27,7 @@ Wrapping all of it is a **sensory settings panel** so the app itself never becom
 - **On-device privacy by design.** Check-ins and every setting live in the browser's local storage. There are no accounts, no database, and no analytics — nothing personal ever leaves the device.
 - **Graceful offline fallback.** If there's no API key or no network, each feature returns curated, hand-written responses instead of an error. The app stays calm and usable in a demo room, on a school network, or on a phone with no signal.
 - **A token-driven theme system.** All colors are CSS variables; the settings panel just flips `data-*` attributes on `<html>`, so themes, contrast, and font scale switch instantly with no flash and no re-render.
+- **A crafted, calm visual identity.** A warm paper-ivory canvas, the Fraunces editorial serif paired with Atkinson Hyperlegible, a signature "breathing aura" motif, and a custom social-share card — distinctive without ever becoming overstimulating.
 
 ## Accessibility & inclusive design
 
@@ -36,7 +37,8 @@ This is the part we're proudest of. Accessibility isn't a settings sub-menu we b
 - **Atkinson Hyperlegible** typeface everywhere, plus a dyslexia-friendly spacing toggle.
 - **Adjustable text size**, **high-contrast mode**, and **reduce motion** (which also honors the OS `prefers-reduced-motion` setting).
 - **Focus mode** that gently dims everything except the task you're on.
-- **Keyboard-first and screen-reader aware**: semantic HTML, real buttons and links, generous visible focus rings, and ARIA where it helps.
+- **Keyboard-first and screen-reader aware**: semantic HTML, real buttons and links, a skip-to-content link, generous visible focus rings, and `aria-live` regions so a screen reader hears each AI response as it arrives.
+- **A duty of care**: every page ends with calm, real helplines (988 in the US, Samaritans in the UK/ROI, findahelpline.com worldwide) and a clear note that Aura is a practice space, not a crisis service.
 - **No dark patterns**: the onboarding is short, optional, and skippable. Nothing traps you, nothing nags you, and there's no scoring or streak to chase.
 
 ## Social impact
@@ -51,10 +53,10 @@ Roughly 1 in 36 young people is autistic, and social and communication situation
 
 ## What's next
 
-- More Practice scenarios, including user-written ones and adjustable difficulty.
-- Optional spoken practice with speech input and output.
-- A private, on-device history and mood trends for Check-in, with an opt-in export.
-- Localization, and a review pass with autistic young people and educators to keep the language right.
+- More Practice scenarios, including user-written ones, plus optional spoken practice with speech input and output.
+- An opt-in encrypted export so Check-in history can move between a user's own devices without ever touching a server.
+- Localized helplines that adapt to the user's region automatically.
+- A review pass with autistic young people and educators to keep the language right.
 
 ## Demo video script (~2 minutes)
 
@@ -65,13 +67,13 @@ Roughly 1 in 36 young people is autistic, and social and communication situation
 Click **Settings** in the top bar. Switch the color mood from Dawn to **Dusk**, bump the **text size** up, and toggle **Reduce motion**. The whole app restyles instantly. "Aura bends to your senses, not the other way around — calmer colors, bigger text, less motion, all on by choice."
 
 **[0:35–1:05] — Run a Practice scenario.**
-Open **Practice**, choose the **café** scenario. Type a slightly nervous opening line. The AI partner responds warmly and in character. Send one or two more messages, then show the **coaching panel and confidence meter** filling in. "It's a patient partner that never rushes you, with gentle coaching afterward — no scores, no judgment."
+Open **Practice**, choose the **café** scenario. Tap a **starter phrase** to show how it removes the "how do I begin?" hurdle, then send a message or two. The AI partner responds warmly and in character while the **coaching panel and confidence meter** fill in. Hit **Finish & reflect** to reveal the gentle end-of-session summary. "A patient partner that never rushes you, a nudge when you're stuck, and a warm reflection at the end — no scores, no judgment."
 
 **[1:05–1:30] — Decode a sarcastic text.**
 Open **Decode**, paste: *"Oh great, another Monday. Can't wait."* Aura returns the literal meaning, flags it as **sarcasm**, reads the tone as tired and joking, and suggests a couple of relaxed replies. "It's the friend you text to ask: wait, what did they actually mean?"
 
 **[1:30–1:50] — Do a Check-in.**
-Open **Check-in**, pick a mood, add a sentence. Aura reflects it back kindly and offers one small grounding tip. "A quick, private way to notice how you feel — kept only on your device."
+Open **Check-in**, pick a mood, add a sentence. Aura reflects it back kindly and offers one small grounding tip — and the **mood-trend sparkline** appears beneath your history. "A quick, private way to notice how you feel, and to see patterns over time — kept only on your device."
 
-**[1:50–2:00] — Close on privacy and impact.**
-Back to the footer. "Aura is private by design, works even offline, and was built for the Youth Code x AI hackathon supporting the Akhil Autism Foundation. A gentle space — for whatever you need today."
+**[1:50–2:00] — Close on care, privacy, and impact.**
+Scroll to the footer with its real support helplines. "Aura is private by design, works even offline, looks after the people who use it, and was built for the Youth Code x AI hackathon supporting the Akhil Autism Foundation. A gentle space — for whatever you need today."

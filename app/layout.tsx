@@ -28,9 +28,35 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Aura — your gentle social companion",
+  metadataBase: new URL("https://aura-seven-livid.vercel.app"),
+  title: {
+    default: "Aura — a gentle place to practice being yourself",
+    template: "%s · Aura",
+  },
   description:
     "Aura helps autistic and neurodiverse young people practice real-world conversations, decode confusing messages, and check in with themselves — in a calm, private, sensory-friendly space.",
+  applicationName: "Aura",
+  keywords: [
+    "autism",
+    "neurodiversity",
+    "social skills",
+    "accessibility",
+    "mental health",
+    "youth",
+  ],
+  openGraph: {
+    title: "Aura — a gentle place to practice being yourself",
+    description:
+      "Practice conversations, decode confusing messages, and check in with how you feel — calm, private, on your own pace.",
+    siteName: "Aura",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Aura — a gentle place to practice being yourself",
+    description:
+      "An AI companion for autistic & neurodiverse youth. Calm, private, on-device.",
+  },
 };
 
 export const viewport: Viewport = {

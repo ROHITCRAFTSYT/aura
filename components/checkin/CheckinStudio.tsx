@@ -17,6 +17,7 @@ import {
   streakDays,
   type CheckinEntry,
 } from "@/components/checkin/storage";
+import { MoodTrend } from "@/components/checkin/MoodTrend";
 
 const MOODS: { value: number; emoji: string; label: string }[] = [
   { value: 1, emoji: "😞", label: "Really low" },
@@ -253,7 +254,11 @@ export function CheckinStudio() {
       )}
 
       {result && !error && (
-        <Card className="flex flex-col gap-5 bg-brand-soft/40 animate-fade-up">
+        <Card
+          role="status"
+          aria-live="polite"
+          className="flex flex-col gap-5 bg-brand-soft/40 animate-fade-up"
+        >
           <div className="flex flex-col gap-2">
             <SectionLabel>Aura noticed</SectionLabel>
             <p className="text-[0.95rem] leading-relaxed text-ink">
@@ -287,6 +292,8 @@ export function CheckinStudio() {
               </Button>
             </div>
           </div>
+
+          {history.length >= 2 && <MoodTrend entries={history} />}
 
           <ul className="flex flex-col gap-2">
             {recent.map((entry) => (
