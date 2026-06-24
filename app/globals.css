@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Aura design tokens.
+ * Colors are RGB triples so Tailwind's `rgb(var(--x) / <alpha>)` works.
+ * Themes + accessibility modes are switched by data-* attributes that
+ * SettingsProvider writes onto <html>. Nothing here hard-codes a color in a
+ * component — everything reads a token, so a single toggle restyles the app.
+ */
+:root {
+  /* default: "Dawn" — warm, low-stimulation */
+  --bg: 247 244 239;
+  --surface: 255 253 250;
+  --surface-2: 244 240 233;
+  --border: 228 222 212;
+  --ink: 41 42 46;
+  --ink-soft: 88 90 98;
+  --ink-faint: 138 140 150;
+  --brand: 92 124 160; /* calm slate-blue */
+  --brand-soft: 224 232 242;
+  --accent: 196 142 110; /* soft terracotta */
+  --calm: 122 158 150; /* sage */
+  --positive: 104 152 120;
+  --warn: 196 150 86;
+  --shadow: 60 56 50;
+
+  --font-sans: var(--font-atkinson), "Inter", system-ui, sans-serif;
+  --font-reading: var(--font-atkinson), Georgia, serif;
+
+  --radius: 1rem;
+  --speed: 1; /* motion multiplier — 0 when reduced motion is on */
+}
+
+/* "Dusk" — dim, cool, easy on light-sensitive eyes */
+[data-theme="dusk"] {
+  --bg: 24 27 33;
+  --surface: 32 36 44;
+  --surface-2: 40 45 55;
+  --border: 52 58 70;
+  --ink: 232 234 240;
+  --ink-soft: 178 184 196;
+  --ink-faint: 128 136 150;
+  --brand: 138 170 206;
+  --brand-soft: 44 56 72;
+  --accent: 214 162 128;
+  --calm: 142 178 168;
+  --positive: 132 184 150;
+  --warn: 214 176 110;
+  --shadow: 0 0 0;
+}
+
+/* "Meadow" — soft green, grounding */
+[data-theme="meadow"] {
+  --bg: 242 246 240;
+  --surface: 252 254 250;
+  --surface-2: 234 242 232;
+  --border: 216 228 214;
+  --ink: 38 46 42;
+  --ink-soft: 82 96 88;
+  --ink-faint: 130 146 136;
+  --brand: 96 142 118;
+  --brand-soft: 220 236 226;
+  --accent: 176 158 110;
+  --calm: 120 162 150;
+  --positive: 96 152 116;
+  --warn: 190 156 84;
+  --shadow: 40 56 46;
+}
+
+/* High contrast — overrides on top of any theme */
+[data-contrast="high"] {
+  --ink: 12 12 14;
+  --ink-soft: 36 38 44;
+  --ink-faint: 70 74 84;
+  --border: 90 94 104;
+  --brand: 40 78 124;
+  --surface: 255 255 255;
+  --bg: 248 248 248;
+}
+[data-theme="dusk"][data-contrast="high"] {
+  --ink: 255 255 255;
+  --ink-soft: 226 230 238;
+  --ink-faint: 190 196 208;
+  --border: 150 158 172;
+  --brand: 168 198 232;
+  --surface: 18 20 26;
+  --bg: 8 9 12;
+}
+
+/* Dyslexia-friendly: switch to Atkinson everywhere + extra spacing */
+[data-readable="true"] {
+  --font-sans: var(--font-atkinson), system-ui, sans-serif;
+  letter-spacing: 0.01em;
+  word-spacing: 0.06em;
+}
+
+/* Font scale steps applied on <html> */
+[data-fontscale="sm"] {
+  font-size: 15px;
+}
+[data-fontscale="md"] {
+  font-size: 17px;
+}
+[data-fontscale="lg"] {
+  font-size: 19px;
+}
+[data-fontscale="xl"] {
+  font-size: 21px;
+}
+
+html {
+  font-size: 17px;
+}
+
+body {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--ink));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.6;
+}
+
+/* Respect user motion preference AND the in-app reduce-motion toggle */
+[data-motion="reduced"] *,
+[data-motion="reduced"] *::before,
+[data-motion="reduced"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Focus mode dims everything except the active card */
+[data-focus="true"] [data-dimmable="true"] {
+  opacity: 0.35;
+  filter: saturate(0.7);
+  transition: opacity 0.3s ease;
+}
+
+/* Clear, generous focus rings for keyboard users */
+:focus-visible {
+  outline: 3px solid rgb(var(--brand));
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: rgb(var(--brand-soft));
+  color: rgb(var(--ink));
+}
+
+/* Calm scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--border)) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--border));
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.aura-card {
+  background-color: rgb(var(--surface));
+  border: 1px solid rgb(var(--border));
+  border-radius: var(--radius);
+}
