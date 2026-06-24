@@ -36,9 +36,17 @@ Typography uses **Atkinson Hyperlegible** for body text (it stays readable even 
 
 **Privacy is a core promise.** All personal data — check-ins and settings — stays in your browser's local storage and never leaves your device. There are no accounts and no tracking. The Check-in tool even draws an on-device **mood trend sparkline** so progress is visible without anything being uploaded.
 
+## Bring your own AI (any provider)
+
+Aura is **provider-agnostic**. Open **Settings → Use your own AI** and paste a key from whichever service you like:
+
+- **Anthropic** (Claude), **OpenAI** (GPT), **Google** (Gemini), **OpenRouter**, **Groq**, **Mistral**, **DeepSeek**, or any **custom OpenAI-compatible** endpoint (just give a base URL + model).
+
+Your key is stored **only on your device** (localStorage) and is sent to Aura's own API route purely to relay the request to your chosen provider. It is never stored on a server, logged, or shared. Remove it any time with one click.
+
 ## Works offline
 
-Aura is **powered by Claude**, but it works even without an API key. If `ANTHROPIC_API_KEY` is unset (or the network is unavailable), every AI feature falls back to curated, hand-written responses so the app never errors and the experience stays calm.
+Aura works **even without any key**. When no key is set (or the network is unavailable), every feature falls back to curated, context-aware responses that read your input and reply in character, so the app never errors and the experience stays calm. A site owner can also set a default `ANTHROPIC_API_KEY` env var so the deployment ships with live answers out of the box.
 
 ---
 

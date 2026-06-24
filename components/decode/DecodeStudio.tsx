@@ -5,11 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { Card, Pill, SectionLabel } from "@/components/ui/Card";
 import { ThinkingDots } from "@/components/ui/Spinner";
 import { cn } from "@/lib/cn";
-import type {
-  ChatResponse,
-  DecodeResult,
-  ResponseSource,
-} from "@/lib/types";
+import { postChat } from "@/lib/chatClient";
+import type { DecodeResult, ResponseSource } from "@/lib/types";
 
 interface Example {
   label: string;
@@ -54,16 +51,11 @@ export function DecodeStudio() {
     setLoading(true);
     setError(false);
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode: "decode",
-          text: trimmed,
-          context: context.trim() || undefined,
-        }),
+      const json = await postChat({
+        mode: "decode",
+        text: trimmed,
+        context: context.trim() || undefined,
       });
-      const json = (await res.json()) as ChatResponse;
       if (json.mode !== "decode") throw new Error("Unexpected response mode");
       setResult(json.data);
       setSource(json.source);

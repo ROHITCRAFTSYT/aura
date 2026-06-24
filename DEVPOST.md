@@ -24,8 +24,9 @@ Wrapping all of it is a **sensory settings panel** so the app itself never becom
 
 - **Next.js 14 (App Router) + TypeScript (strict) + Tailwind CSS** for a fast, typed, themeable front end.
 - **Claude** (via the `@anthropic-ai/sdk`) powers the roleplay, the message decoding, and the check-in reflections through a single API route, with carefully written system prompts for each tool's tone.
-- **On-device privacy by design.** Check-ins and every setting live in the browser's local storage. There are no accounts, no database, and no analytics — nothing personal ever leaves the device.
-- **Graceful offline fallback.** If there's no API key or no network, each feature returns curated, hand-written responses instead of an error. The app stays calm and usable in a demo room, on a school network, or on a phone with no signal.
+- **Bring your own AI, any provider.** You can connect Anthropic, OpenAI, Google Gemini, OpenRouter, Groq, Mistral, DeepSeek, or any OpenAI-compatible endpoint with your own key. The key is stored only on your device and is used purely to relay your request to the provider you picked.
+- **On-device privacy by design.** Check-ins, every setting, and any AI key live in the browser's local storage. There are no accounts, no database, and no analytics, so nothing personal ever leaves the device.
+- **Graceful offline fallback.** With no key or no network, each feature returns curated responses that actually read what you typed and reply in character, instead of an error. The app stays calm and usable in a demo room, on a school network, or on a phone with no signal.
 - **A token-driven theme system.** All colors are CSS variables; the settings panel just flips `data-*` attributes on `<html>`, so themes, contrast, and font scale switch instantly with no flash and no re-render.
 - **A crafted, calm visual identity.** A warm paper-ivory canvas, the Fraunces editorial serif paired with Atkinson Hyperlegible, a signature "breathing aura" motif, and a custom social-share card — distinctive without ever becoming overstimulating.
 

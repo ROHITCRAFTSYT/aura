@@ -5,11 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { Card, Pill, SectionLabel } from "@/components/ui/Card";
 import { ThinkingDots } from "@/components/ui/Spinner";
 import { cn } from "@/lib/cn";
-import type {
-  ChatResponse,
-  CheckinResult,
-  ResponseSource,
-} from "@/lib/types";
+import { postChat } from "@/lib/chatClient";
+import type { CheckinResult, ResponseSource } from "@/lib/types";
 import {
   clearCheckins,
   loadCheckins,
@@ -73,17 +70,12 @@ export function CheckinStudio() {
     setError(false);
     setResult(null);
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode: "checkin",
-          mood,
-          energy,
-          note: note.trim() || undefined,
-        }),
+      const json = await postChat({
+        mode: "checkin",
+        mood,
+        energy,
+        note: note.trim() || undefined,
       });
-      const json = (await res.json()) as ChatResponse;
       if (json.mode !== "checkin") throw new Error("Unexpected response mode");
       setResult(json.data);
       setSource(json.source);

@@ -6,9 +6,9 @@ import { Card, Pill, SectionLabel } from "@/components/ui/Card";
 import { ThinkingDots } from "@/components/ui/Spinner";
 import { cn } from "@/lib/cn";
 import { getScenario, SCENARIOS } from "@/lib/scenarios";
+import { postChat } from "@/lib/chatClient";
 import type {
   ChatMessage,
-  ChatResponse,
   Difficulty,
   PracticeReply,
   ResponseSource,
@@ -110,17 +110,12 @@ export function PracticeStudio() {
     setLoading(true);
     setError(false);
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode: "practice",
-          scenarioId,
-          difficulty,
-          messages: nextMessages,
-        }),
+      const json = await postChat({
+        mode: "practice",
+        scenarioId,
+        difficulty,
+        messages: nextMessages,
       });
-      const json = (await res.json()) as ChatResponse;
       if (json.mode !== "practice") throw new Error("Unexpected response mode");
       const data: PracticeReply = json.data;
       setMessages([...nextMessages, { role: "assistant", content: data.reply }]);

@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import type {
   ChatRequest,
   ChatResponse,
@@ -9,6 +8,7 @@ import type {
   DecodeResult,
   CheckinResult,
 } from "@/lib/types";
+import type { AiPayload, ProviderKind } from "@/lib/aiConfig";
 import { getScenario, SCENARIOS } from "@/lib/scenarios";
 import { practiceSystem, decodeSystem, checkinSystem } from "@/lib/prompts";
 import {
@@ -20,23 +20,27 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MODEL = "claude-opus-4-8";
+const ENV_MODEL = "claude-opus-4-8";
 const MAX_TOKENS = 700;
 
 // ---------------------------------------------------------------------------
 // Small helpers
 // ---------------------------------------------------------------------------
 
-/** Clamp a value to an integer within [min, max], falling back to `fallback`. */
 function clampInt(value: unknown, min: number, max: number, fallback: number): number {
   const n = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(n)) return fallback;
   return Math.max(min, Math.min(max, Math.round(n)));
 }
 
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null;
+}
+
 /**
  * Parse JSON robustly. First try a plain JSON.parse; if that fails, extract the
- * first balanced {...} substring and parse that. Returns null on failure.
+ * first balanced {...} substring and parse that (covers models that wrap JSON
+ * in prose or code fences). Returns null on failure.
  */
 function parseJsonLoose(raw: string): unknown {
   const trimmed = raw.trim();
@@ -65,9 +69,8 @@ function parseJsonLoose(raw: string): unknown {
     else if (ch === "}") {
       depth--;
       if (depth === 0) {
-        const candidate = trimmed.slice(start, i + 1);
         try {
-          return JSON.parse(candidate);
+          return JSON.parse(trimmed.slice(start, i + 1));
         } catch {
           return null;
         }
@@ -77,20 +80,109 @@ function parseJsonLoose(raw: string): unknown {
   return null;
 }
 
-/** Extract the first text block from an Anthropic response. */
-function extractText(response: Anthropic.Message): string | null {
-  for (const block of response.content) {
-    if (block.type === "text") return block.text;
+// ---------------------------------------------------------------------------
+// Provider selection + calling
+// ---------------------------------------------------------------------------
+
+/** Read a user-supplied bring-your-own-key payload from the request body. */
+function readUserAi(body: unknown): AiPayload | null {
+  if (!isRecord(body)) return null;
+  const ai = body.ai;
+  if (!isRecord(ai)) return null;
+  const apiKey = typeof ai.apiKey === "string" ? ai.apiKey.trim() : "";
+  if (!apiKey) return null;
+  const kind: ProviderKind = ai.kind === "anthropic" ? "anthropic" : "openai";
+  const model =
+    typeof ai.model === "string" && ai.model.trim()
+      ? ai.model.trim()
+      : kind === "anthropic"
+        ? "claude-3-5-sonnet-latest"
+        : "gpt-4o-mini";
+  let baseUrl =
+    typeof ai.baseUrl === "string" ? ai.baseUrl.trim().replace(/\/+$/, "") : "";
+  if (!baseUrl)
+    baseUrl = kind === "anthropic" ? "https://api.anthropic.com" : "https://api.openai.com/v1";
+  return { kind, apiKey, model, baseUrl };
+}
+
+/** User key wins; otherwise fall back to a server ANTHROPIC_API_KEY if present. */
+function effectiveAi(body: unknown): AiPayload | null {
+  const user = readUserAi(body);
+  if (user) return user;
+  const env = process.env.ANTHROPIC_API_KEY;
+  if (env && env.trim()) {
+    return {
+      kind: "anthropic",
+      apiKey: env.trim(),
+      model: ENV_MODEL,
+      baseUrl: "https://api.anthropic.com",
+    };
   }
   return null;
 }
 
-function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === "object" && v !== null;
+/** Call the chosen provider and return its raw text reply, or throw. */
+async function callLLM(
+  system: string,
+  messages: ChatMessage[],
+  ai: AiPayload,
+): Promise<string | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 30_000);
+  try {
+    if (ai.kind === "anthropic") {
+      const res = await fetch(`${ai.baseUrl}/v1/messages`, {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "content-type": "application/json",
+          "x-api-key": ai.apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: ai.model,
+          max_tokens: MAX_TOKENS,
+          system,
+          messages: messages.map((m) => ({ role: m.role, content: m.content })),
+        }),
+      });
+      if (!res.ok) throw new Error(`anthropic ${res.status}`);
+      const data = (await res.json()) as {
+        content?: Array<{ type?: string; text?: string }>;
+      };
+      const block = data.content?.find((b) => b?.type === "text");
+      return block?.text ?? null;
+    }
+
+    // OpenAI-compatible (OpenAI, Gemini, OpenRouter, Groq, Mistral, DeepSeek, custom)
+    const res = await fetch(`${ai.baseUrl}/chat/completions`, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${ai.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: ai.model,
+        max_tokens: MAX_TOKENS,
+        messages: [
+          { role: "system", content: system },
+          ...messages.map((m) => ({ role: m.role, content: m.content })),
+        ],
+      }),
+    });
+    if (!res.ok) throw new Error(`openai-compatible ${res.status}`);
+    const data = (await res.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    return data.choices?.[0]?.message?.content ?? null;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // ---------------------------------------------------------------------------
-// Per-mode validation + normalization. Each returns the typed data or null.
+// Per-mode validation + normalization
 // ---------------------------------------------------------------------------
 
 function validatePractice(data: unknown): PracticeReply | null {
@@ -143,37 +235,30 @@ function validateCheckin(data: unknown): CheckinResult | null {
 // ---------------------------------------------------------------------------
 
 export async function POST(request: Request): Promise<Response> {
-  let body: ChatRequest;
+  let raw: unknown;
   try {
-    body = (await request.json()) as ChatRequest;
+    raw = await request.json();
   } catch {
-    // Malformed body — return a safe, generic fallback rather than a 500.
     return NextResponse.json(genericCheckinFallback());
   }
+
+  const ai = effectiveAi(raw);
+  const body = raw as ChatRequest;
 
   try {
     switch (body?.mode) {
       case "practice":
-        return NextResponse.json(await handlePractice(body));
+        return NextResponse.json(await handlePractice(body, ai));
       case "decode":
-        return NextResponse.json(await handleDecode(body));
+        return NextResponse.json(await handleDecode(body, ai));
       case "checkin":
-        return NextResponse.json(await handleCheckin(body));
+        return NextResponse.json(await handleCheckin(body, ai));
       default:
-        // Unknown mode — answer with a harmless check-in fallback.
         return NextResponse.json(genericCheckinFallback());
     }
   } catch {
-    // Absolute safety net: never throw a 500 to the client.
     return NextResponse.json(safeFallbackFor(body));
   }
-}
-
-/** Build an Anthropic client if a key exists, else null (use fallback). */
-function getClient(): Anthropic | null {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key || key.trim().length === 0) return null;
-  return new Anthropic({ apiKey: key });
 }
 
 // ---------------------------------------------------------------------------
@@ -182,27 +267,19 @@ function getClient(): Anthropic | null {
 
 async function handlePractice(
   body: Extract<ChatRequest, { mode: "practice" }>,
+  ai: AiPayload | null,
 ): Promise<ChatResponse> {
   const scenario = getScenario(body.scenarioId) ?? SCENARIOS[0];
   const difficulty: Difficulty = body.difficulty ?? "real";
   const messages: ChatMessage[] = Array.isArray(body.messages) ? body.messages : [];
 
-  const client = getClient();
-  if (client) {
+  if (ai) {
     try {
-      const response = await client.messages.create({
-        model: MODEL,
-        max_tokens: MAX_TOKENS,
-        system: practiceSystem(scenario, difficulty),
-        messages: messages.map((m) => ({ role: m.role, content: m.content })),
-      });
-      const text = extractText(response);
+      const text = await callLLM(practiceSystem(scenario, difficulty), messages, ai);
       const parsed = text ? validatePractice(parseJsonLoose(text)) : null;
-      if (parsed) {
-        return { mode: "practice", source: "ai", data: parsed };
-      }
+      if (parsed) return { mode: "practice", source: "ai", data: parsed };
     } catch {
-      // fall through to fallback
+      /* fall through to fallback */
     }
   }
 
@@ -215,64 +292,44 @@ async function handlePractice(
 
 async function handleDecode(
   body: Extract<ChatRequest, { mode: "decode" }>,
+  ai: AiPayload | null,
 ): Promise<ChatResponse> {
   const text = typeof body.text === "string" ? body.text : "";
   const context = typeof body.context === "string" ? body.context : undefined;
 
-  const client = getClient();
-  if (client) {
+  if (ai) {
     try {
       const userContent = context
         ? `Message: ${text}\n\nContext: ${context}`
         : `Message: ${text}`;
-      const response = await client.messages.create({
-        model: MODEL,
-        max_tokens: MAX_TOKENS,
-        system: decodeSystem(),
-        messages: [{ role: "user", content: userContent }],
-      });
-      const out = extractText(response);
+      const out = await callLLM(decodeSystem(), [{ role: "user", content: userContent }], ai);
       const parsed = out ? validateDecode(parseJsonLoose(out)) : null;
-      if (parsed) {
-        return { mode: "decode", source: "ai", data: parsed };
-      }
+      if (parsed) return { mode: "decode", source: "ai", data: parsed };
     } catch {
-      // fall through to fallback
+      /* fall through */
     }
   }
 
-  return {
-    mode: "decode",
-    source: "fallback",
-    data: decodeFallback(text, context),
-  };
+  return { mode: "decode", source: "fallback", data: decodeFallback(text, context) };
 }
 
 async function handleCheckin(
   body: Extract<ChatRequest, { mode: "checkin" }>,
+  ai: AiPayload | null,
 ): Promise<ChatResponse> {
   const mood = clampInt(body.mood, 1, 5, 3);
   const energy = clampInt(body.energy, 1, 5, 3);
   const note = typeof body.note === "string" ? body.note : undefined;
 
-  const client = getClient();
-  if (client) {
+  if (ai) {
     try {
       const noteLine = note && note.trim().length > 0 ? `\nNote: ${note}` : "";
       const userContent = `Mood: ${mood} out of 5\nEnergy: ${energy} out of 5${noteLine}`;
-      const response = await client.messages.create({
-        model: MODEL,
-        max_tokens: MAX_TOKENS,
-        system: checkinSystem(),
-        messages: [{ role: "user", content: userContent }],
-      });
-      const out = extractText(response);
+      const out = await callLLM(checkinSystem(), [{ role: "user", content: userContent }], ai);
       const parsed = out ? validateCheckin(parseJsonLoose(out)) : null;
-      if (parsed) {
-        return { mode: "checkin", source: "ai", data: parsed };
-      }
+      if (parsed) return { mode: "checkin", source: "ai", data: parsed };
     } catch {
-      // fall through to fallback
+      /* fall through */
     }
   }
 
@@ -288,14 +345,9 @@ async function handleCheckin(
 // ---------------------------------------------------------------------------
 
 function genericCheckinFallback(): ChatResponse {
-  return {
-    mode: "checkin",
-    source: "fallback",
-    data: checkinFallback(3, 3),
-  };
+  return { mode: "checkin", source: "fallback", data: checkinFallback(3, 3) };
 }
 
-/** Pick a sensible fallback shape based on whatever the body claims to be. */
 function safeFallbackFor(body: ChatRequest | undefined): ChatResponse {
   if (body?.mode === "practice") {
     const scenario = getScenario(body.scenarioId) ?? SCENARIOS[0];

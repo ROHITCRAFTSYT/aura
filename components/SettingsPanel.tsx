@@ -1,12 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSettings } from "@/components/SettingsProvider";
 import {
   FONT_SCALE_OPTIONS,
   THEME_OPTIONS,
   type FontScale,
 } from "@/lib/settings";
+import {
+  PROVIDERS,
+  getPreset,
+  loadAiConfig,
+  saveAiConfig,
+  clearAiConfig,
+  type AiProvider,
+} from "@/lib/aiConfig";
+import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 
 function Toggle({
@@ -57,6 +66,43 @@ export function SettingsPanel({
   onClose: () => void;
 }) {
   const { settings, update } = useSettings();
+
+  // Bring-your-own-key state (kept entirely on this device).
+  const [aiProvider, setAiProvider] = useState<AiProvider>("anthropic");
+  const [aiKey, setAiKey] = useState("");
+  const [aiModel, setAiModel] = useState("");
+  const [aiBaseUrl, setAiBaseUrl] = useState("");
+  const [connected, setConnected] = useState(false);
+  const preset = getPreset(aiProvider);
+
+  useEffect(() => {
+    const c = loadAiConfig();
+    if (c) {
+      setAiProvider(c.provider);
+      setAiKey(c.apiKey);
+      setAiModel(c.model);
+      setAiBaseUrl(c.baseUrl);
+      setConnected(true);
+    }
+  }, []);
+
+  function connectAi() {
+    if (!aiKey.trim()) return;
+    const p = getPreset(aiProvider);
+    saveAiConfig({
+      provider: aiProvider,
+      apiKey: aiKey.trim(),
+      model: aiModel.trim() || p.defaultModel,
+      baseUrl: aiProvider === "custom" ? aiBaseUrl.trim() : p.baseUrl,
+    });
+    setConnected(true);
+  }
+
+  function removeAi() {
+    clearAiConfig();
+    setAiKey("");
+    setConnected(false);
+  }
 
   // Close on Escape.
   useEffect(() => {
@@ -186,9 +232,120 @@ export function SettingsPanel({
           />
         </section>
 
+        {/* Bring your own AI */}
+        <section className="space-y-3 rounded-2xl border border-border bg-surface p-4">
+          <div>
+            <p className="text-sm font-semibold text-ink">
+              Use your own AI{" "}
+              <span className="font-normal text-ink-faint">(optional)</span>
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+              By default Aura uses built-in demo replies. Add a key from any
+              provider for live, smarter answers. Your key is stored only on this
+              device.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="ai-provider" className="sr-only">
+              AI provider
+            </label>
+            <select
+              id="ai-provider"
+              value={aiProvider}
+              onChange={(e) => {
+                setAiProvider(e.target.value as AiProvider);
+                setAiModel("");
+              }}
+              className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-ink focus-visible:border-brand focus-visible:outline-none"
+            >
+              {PROVIDERS.map((p) => (
+                <option key={p.value} value={p.value}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+
+            {aiProvider === "custom" && (
+              <input
+                value={aiBaseUrl}
+                onChange={(e) => setAiBaseUrl(e.target.value)}
+                placeholder="Base URL, e.g. https://host/v1"
+                autoComplete="off"
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus-visible:border-brand focus-visible:outline-none"
+              />
+            )}
+
+            <input
+              value={aiModel}
+              onChange={(e) => setAiModel(e.target.value)}
+              placeholder={
+                preset.defaultModel
+                  ? `Model (default: ${preset.defaultModel})`
+                  : "Model name"
+              }
+              autoComplete="off"
+              className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus-visible:border-brand focus-visible:outline-none"
+            />
+
+            <label htmlFor="ai-key" className="sr-only">
+              API key
+            </label>
+            <input
+              id="ai-key"
+              type="password"
+              value={aiKey}
+              onChange={(e) => setAiKey(e.target.value)}
+              placeholder={`API key ${preset.keyHint}`}
+              autoComplete="off"
+              spellCheck={false}
+              className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus-visible:border-brand focus-visible:outline-none"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              onClick={connectAi}
+              disabled={
+                !aiKey.trim() || (aiProvider === "custom" && !aiBaseUrl.trim())
+              }
+            >
+              {connected ? "Update" : "Connect"}
+            </Button>
+            {connected && (
+              <Button size="sm" variant="ghost" onClick={removeAi}>
+                Remove
+              </Button>
+            )}
+            {preset.keysUrl && (
+              <a
+                href={preset.keysUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs font-medium text-brand underline underline-offset-2"
+              >
+                Get a key →
+              </a>
+            )}
+          </div>
+
+          <p className="text-xs">
+            {connected ? (
+              <span className="text-positive">
+                ● Connected — live answers are on.
+              </span>
+            ) : (
+              <span className="text-ink-faint">
+                ○ Not connected — using calm demo replies.
+              </span>
+            )}
+          </p>
+        </section>
+
         <p className="mt-auto rounded-xl bg-surface-2 px-4 py-3 text-xs leading-relaxed text-ink-soft">
-          🔒 Aura keeps your check-ins and settings on your own device. Nothing
-          is saved to an account.
+          🔒 Aura keeps your check-ins, settings, and any AI key on your own
+          device. Nothing is saved to an account.
         </p>
       </aside>
     </div>
