@@ -35,3 +35,7 @@ next-env.d.ts
 
 .vercel
 shots/
+
+# submission notes / dev-only (kept locally, not on GitHub)
+DEVPOST.md
+scripts/
