@@ -8,6 +8,8 @@ Built for the **Youth Code x AI** hackathon (Track 3: *AI That Actually Helps Pe
 
 🌐 **Live demo:** https://aura-seven-livid.vercel.app
 
+![Aura landing page](docs/screenshots/landing.png)
+
 ---
 
 ## What it does
@@ -37,6 +39,35 @@ Typography uses **Atkinson Hyperlegible** for body text (it stays readable even 
 ## Works offline
 
 Aura is **powered by Claude**, but it works even without an API key. If `ANTHROPIC_API_KEY` is unset (or the network is unavailable), every AI feature falls back to curated, hand-written responses so the app never errors and the experience stays calm.
+
+---
+
+## Screenshots
+
+**Practice** — rehearse a scenario with a patient partner, with gentle coaching and a confidence meter.
+
+![Practice with coaching](docs/screenshots/practice-coach.png)
+
+**Decode** — make sense of a confusing or sarcastic message, with kind ways to reply.
+
+![Decode a message](docs/screenshots/decode.png)
+
+**Check-in** — a quick mood log with a warm reflection and an on-device mood trend.
+
+![Check-in mood trend](docs/screenshots/mood-trend.png)
+
+**Sensory settings** — tune colour, text size, contrast, spacing, motion, and focus mode.
+
+![Sensory and accessibility settings](docs/screenshots/settings.png)
+
+<details>
+<summary>More screens</summary>
+
+![Practice scenario picker](docs/screenshots/practice-picker.png)
+
+![Check-in](docs/screenshots/checkin.png)
+
+</details>
 
 ---
 
