@@ -46,12 +46,27 @@ export const FONT_SCALE_OPTIONS: { value: FontScale; label: string }[] = [
   { value: "xl", label: "Extra large" },
 ];
 
+/**
+ * Accessibility defaults inferred from the operating system, so a first-time
+ * visitor who already asked their device for less motion or more contrast gets
+ * a calmer experience without touching Settings. Only used when nothing has
+ * been saved yet — an explicit choice always wins.
+ */
+function systemDefaults(): Partial<Settings> {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return {};
+  const patch: Partial<Settings> = {};
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) patch.motion = "reduced";
+  if (window.matchMedia("(prefers-contrast: more)").matches) patch.contrast = "high";
+  return patch;
+}
+
 /** Read settings safely (handles SSR + malformed storage). */
 export function loadSettings(): Settings {
   if (typeof window === "undefined") return DEFAULT_SETTINGS;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT_SETTINGS;
+    // First run: seed from the visitor's OS accessibility preferences.
+    if (!raw) return { ...DEFAULT_SETTINGS, ...systemDefaults() };
     const parsed = JSON.parse(raw) as Partial<Settings>;
     return { ...DEFAULT_SETTINGS, ...parsed };
   } catch {
