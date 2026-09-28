@@ -52,23 +52,43 @@ export const FONT_SCALE_OPTIONS: { value: FontScale; label: string }[] = [
  * a calmer experience without touching Settings. Only used when nothing has
  * been saved yet — an explicit choice always wins.
  */
+/** OS-derived accessibility patch from the two media-query results. Pure. */
+export function systemPatchFrom(prefersReducedMotion: boolean, prefersMoreContrast: boolean): Partial<Settings> {
+  const patch: Partial<Settings> = {};
+  if (prefersReducedMotion) patch.motion = "reduced";
+  if (prefersMoreContrast) patch.contrast = "high";
+  return patch;
+}
+
 function systemDefaults(): Partial<Settings> {
   if (typeof window === "undefined" || typeof window.matchMedia !== "function") return {};
-  const patch: Partial<Settings> = {};
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) patch.motion = "reduced";
-  if (window.matchMedia("(prefers-contrast: more)").matches) patch.contrast = "high";
-  return patch;
+  return systemPatchFrom(
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    window.matchMedia("(prefers-contrast: more)").matches,
+  );
+}
+
+/**
+ * Resolve effective settings from the raw stored value and an OS patch. Pure —
+ * no DOM. First run (no stored value) seeds from `system`; an explicit stored
+ * choice always wins; malformed storage falls back to defaults.
+ */
+export function resolveSettings(rawStored: string | null, system: Partial<Settings>): Settings {
+  // First run: seed from the visitor's OS accessibility preferences.
+  if (!rawStored) return { ...DEFAULT_SETTINGS, ...system };
+  try {
+    const parsed = JSON.parse(rawStored) as Partial<Settings>;
+    return { ...DEFAULT_SETTINGS, ...parsed };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
 }
 
 /** Read settings safely (handles SSR + malformed storage). */
 export function loadSettings(): Settings {
   if (typeof window === "undefined") return DEFAULT_SETTINGS;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    // First run: seed from the visitor's OS accessibility preferences.
-    if (!raw) return { ...DEFAULT_SETTINGS, ...systemDefaults() };
-    const parsed = JSON.parse(raw) as Partial<Settings>;
-    return { ...DEFAULT_SETTINGS, ...parsed };
+    return resolveSettings(window.localStorage.getItem(STORAGE_KEY), systemDefaults());
   } catch {
     return DEFAULT_SETTINGS;
   }
